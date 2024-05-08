@@ -12,6 +12,10 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(turtlesim REQUIRED)
 
+include_directories(
+  include
+  )
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -37,9 +41,7 @@ endif()
 #)
 
 #Try3
-include_directories(
-  include
-  )
+
 
 
 add_executable(cmd_publisher src/cmd_publisher.cpp)
