@@ -3,99 +3,94 @@
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-CmdPublisher::CmdPublisher() : Node("minimal_publisher")
-  {
-    publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("turtle1/cmd_vel", 10);
+CmdPublisher::CmdPublisher() : Node("minimal_publisher") {
+  publisher_ =
+      this->create_publisher<geometry_msgs::msg::Twist>("turtle1/cmd_vel", 10);
 
-    subscription_ = this->create_subscription<turtlesim::msg::Pose>(
+  subscription_ = this->create_subscription<turtlesim::msg::Pose>(
       "turtle1/pose", 10, std::bind(&CmdPublisher::topic_callback, this, _1));
-    
-    timer_ = this->create_wall_timer(
-    10ms, std::bind(&CmdPublisher::timer_callback, this));
+
+  timer_ = this->create_wall_timer(
+      10ms, std::bind(&CmdPublisher::timer_callback, this));
+}
+
+void CmdPublisher::topic_callback(const turtlesim::msg::Pose &msg) {
+  real_x = msg.x - ori;
+  real_y = msg.y - ori;
+  real_theta = msg.theta;
+}
+
+void CmdPublisher::timer_callback() {
+  // Goal assignment
+  if (cnt == 0) {
+    goal_x = 2;
+    goal_y = 0;
+    goal_theta = 0;
+  } else if (cnt == 1) {
+    goal_x = 2;
+    goal_y = 0;
+    goal_theta = 0.5 * pi;
+  } else if (cnt == 2) {
+    goal_x = 2;
+    goal_y = 2;
+    goal_theta = 0.5 * pi;
+  } else if (cnt == 3) {
+    goal_x = 2;
+    goal_y = 2;
+    goal_theta = pi;
+  } else if (cnt == 4) {
+    goal_x = 0;
+    goal_y = 2;
+    goal_theta = pi;
+  } else if (cnt == 5) {
+    goal_x = 0;
+    goal_y = 2;
+    goal_theta = 1.5 * pi;
+  } else if (cnt == 6) {
+    goal_x = 0;
+    goal_y = 0;
+    goal_theta = 1.5 * pi;
+  } else if (cnt == 7) {
+    goal_x = 0;
+    goal_y = 0;
+    goal_theta = 0;
   }
 
+  // Error
+  double err_x = goal_x - real_x;
+  double err_y = goal_y - real_y;
+  double err_dist = sqrt(err_x * err_x + err_y * err_y);
 
-  void CmdPublisher::topic_callback(const turtlesim::msg::Pose &msg)
-  {
-    real_x = msg.x - ori;
-    real_y = msg.y - ori;
-    real_z = msg.theta;
-    //RCLCPP_INFO(this->get_logger(), "x position: '%lf'", real_x);
-    //RCLCPP_INFO(this->get_logger(), "y position: '%lf'", real_y);
+  double err_theta = goal_theta - real_theta;
+  if (err_theta > 2 * pi) {
+    err_theta -= 2 * pi;
+  } else if (err_theta < -2 * pi) {
+    err_theta += 2 * pi;
   }
 
-
-   void CmdPublisher::timer_callback()
-  {
-    err_x = x_goal - real_x;
-    err_y = y_goal - real_y;
-
-    double linear_err = sqrt(err_x * err_x + err_y * err_y);
-
-    z_goal = atan2(err_y, err_x);
-    err_theta = z_goal - real_z;
-
-  if(err_theta > 3.141592 * 2)
-  {
-    err_theta -= 3.141592 * 2;
-  }
-  else if (err_theta < - 3.141592*2)
-  {
-    err_theta += 3.141592 * 2;
-
+  // State transition
+  if ((cnt % 2 == 0 and err_dist < dist_threshold) or
+      (cnt % 2 == 1 and err_theta < theta_threshold)) {
+    cnt++;
+    cnt = cnt % 8;
+ 
+    // Reset error term to prevent error divergence
+    sum_err_dist = 0;
+    sum_err_theta = 0;
   }
 
-    // if(err_theta < 0.05)
-    // {
-    // cmd_vel.linear.x = linear_err;
-    // cmd_vel.angular.z = 0;
-    // }
-    // else{
-    // cmd_vel.linear.x = 0;
-    // cmd_vel.angular.z = err_theta;
-    // }
+  // PID control
+  sum_err_dist += err_dist * dt;
+  sum_err_theta += err_theta * dt;
+  double delta_err_dist = (err_dist - prev_err_dist) / dt;
+  double delta_err_theta = (err_theta - prev_err_theta) / dt;
+  cmd_vel.linear.x = kP_dist * err_dist + kI_dist * sum_err_dist + kD_dist * delta_err_dist;
+  cmd_vel.angular.z = kP_theta * err_theta + kI_theta * sum_err_theta + kD_theta * delta_err_theta;
 
-    cmd_vel.linear.x = linear_err;
-    cmd_vel.angular.z = err_theta;
-    
-    if(linear_err < 0.1) cnt++;
+  // Save the error for the next command
+  prev_err_dist = err_dist;
+  prev_err_theta = err_theta;
 
-    if(cnt == 1)
-    {
-      x_goal =2;
-      y_goal =2;
-      RCLCPP_INFO(this->get_logger(), "1");
-
-    }
-    
-    if(cnt == 2)
-    {
-      x_goal =-2;
-      y_goal =2;
-      RCLCPP_INFO(this->get_logger(), "2");
-
-    }
-
-    if(cnt == 3)
-    {
-      x_goal =-2;
-      y_goal =-2;
-      RCLCPP_INFO(this->get_logger(), "3");
-
-    }
-
-    if(cnt == 4)
-    {
-      x_goal =2;
-      y_goal =-2;
-      cnt = 0;
-      RCLCPP_INFO(this->get_logger(), "4");
-
-    }
-    //RCLCPP_INFO(this->get_logger(), "cmd_vel.linear.x: '%lf'", cmd_vel.linear.x);
-    RCLCPP_INFO(this->get_logger(), "err_theta: '%lf'", err_theta);
-
-    //publish!!!
-    publisher_->publish(cmd_vel);
-    //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-  }
+  // Publish!!!
+  publisher_->publish(cmd_vel);
+}
