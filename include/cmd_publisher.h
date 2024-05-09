@@ -1,5 +1,5 @@
-#include <cstdio>
 #include <chrono>
+#include <cstdio>
 #include <functional>
 #include <memory>
 #include <string>
@@ -10,54 +10,51 @@
 #include "geometry_msgs/msg/twist.hpp"
 #include <turtlesim/msg/pose.hpp>
 
+#include <cmath>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
-#include <cmath>
 
-class CmdPublisher : public rclcpp::Node
-{
+class CmdPublisher : public rclcpp::Node {
 public:
   CmdPublisher();
-  
+
 private:
- void topic_callback(const turtlesim::msg::Pose &msg);
+  void topic_callback(const turtlesim::msg::Pose &msg);
 
- void timer_callback();
+  void timer_callback();
 
-  //position
+  // position
   double ori = 5.544444561004639;
   double real_x = 0;
   double real_y = 0;
-  double real_z = 0;
-  double threshold = 0.1;
-  
-  double x_goal = 2;
-  double y_goal = 0;
-  double z_goal = 0;
+  double real_theta = 0;
 
-  //double cmd_x = 0;
-  //double cmd_y = 0;
+  double goal_x = 2;
+  double goal_y = 0;
+  double goal_theta = 0;
 
-  //error
-  double err_x = 0;
-  double err_y = 0;
-  double err_theta = 0;
-
-  //trajectory
-  double square_dist = 3;
   double dt = 0.01;
-  double cnt = 0;
-  double real_time=0;
 
-  double kP_x = 1;
-  double kP_y = 2;
+  // State
+  int cnt = 0;
+  double dist_threshold = 0.05;
+  double theta_threshold = 0.01;
 
-  bool x_flag = false;
-  bool y_flag = false;
+  // PID error
+  double prev_err_dist = 0;
+  double prev_err_theta = 0;
+  double sum_err_dist = 0;
+  double sum_err_theta = 0;
 
-  double x_velocity = 3;
-  double z_velocity = 3;
-  int sig = 0;
+  // PID gain
+  double kP_dist = 1;
+  double kI_dist = 0.05;
+  double kD_dist = 0.01;
+  double kP_theta = 1;
+  double kI_theta = 0.05;
+  double kD_theta = 0.01;
+
+  const double pi = 3.141592;
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
