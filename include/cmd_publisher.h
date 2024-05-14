@@ -1,18 +1,9 @@
-#include <chrono>
-#include <cstdio>
-#include <functional>
-#include <memory>
-#include <string>
+#ifndef ROS2_TUTORIAL_CMD_PUBLISHER_H
+#define ROS2_TUTORIAL_CMD_PUBLISHER_H
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
-
 #include "geometry_msgs/msg/twist.hpp"
 #include <turtlesim/msg/pose.hpp>
-
-#include <cmath>
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
 
 class CmdPublisher : public rclcpp::Node {
 public:
@@ -64,3 +55,5 @@ private:
   // Init variables
   geometry_msgs::msg::Twist cmd_vel;
 };
+
+#endif //ROS2_TUTORIAL_CMD_PUBLISHER_H
