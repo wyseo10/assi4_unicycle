@@ -23,20 +23,21 @@ def generate_launch_description():
         )
         ld.add_action(controller_node)
 
-    simulator_node = Node(
-        namespace = 'simulator',
-        package='ros2_tutorial',
-        executable='simulator_node',
-        output='screen'
-    )
-    ld.add_action(simulator_node)
-
-    rviz_node = Node(
-        package='rviz2',
-        namespace='rviz2',
-        executable='rviz2',
-        name='rviz2',
-    )
-    ld.add_action(rviz_node)
+    # Uncomment the following!
+    # simulator_node = Node(
+    #     namespace = 'simulator',
+    #     package='ros2_tutorial',
+    #     executable='simulator_node',
+    #     output='screen'
+    # )
+    # ld.add_action(simulator_node)
+    #
+    # rviz_node = Node(
+    #     package='rviz2',
+    #     namespace='rviz2',
+    #     executable='rviz2',
+    #     name='rviz2',
+    # )
+    # ld.add_action(rviz_node)
 
     return ld
