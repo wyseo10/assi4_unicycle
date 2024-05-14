@@ -22,35 +22,35 @@ void CmdPublisher::topic_callback(const turtlesim::msg::Pose &msg) {
 
 void CmdPublisher::timer_callback() {
   // Goal assignment
-  if (cnt == 0) {
+  if (count == 0) {
     goal_x = 2;
     goal_y = 0;
     goal_theta = 0;
-  } else if (cnt == 1) {
+  } else if (count == 1) {
     goal_x = 2;
     goal_y = 0;
     goal_theta = 0.5 * pi;
-  } else if (cnt == 2) {
+  } else if (count == 2) {
     goal_x = 2;
     goal_y = 2;
     goal_theta = 0.5 * pi;
-  } else if (cnt == 3) {
+  } else if (count == 3) {
     goal_x = 2;
     goal_y = 2;
     goal_theta = pi;
-  } else if (cnt == 4) {
+  } else if (count == 4) {
     goal_x = 0;
     goal_y = 2;
     goal_theta = pi;
-  } else if (cnt == 5) {
+  } else if (count == 5) {
     goal_x = 0;
     goal_y = 2;
     goal_theta = 1.5 * pi;
-  } else if (cnt == 6) {
+  } else if (count == 6) {
     goal_x = 0;
     goal_y = 0;
     goal_theta = 1.5 * pi;
-  } else if (cnt == 7) {
+  } else if (count == 7) {
     goal_x = 0;
     goal_y = 0;
     goal_theta = 0;
@@ -69,10 +69,10 @@ void CmdPublisher::timer_callback() {
   }
 
   // State transition
-  if ((cnt % 2 == 0 and err_dist < dist_threshold) or
-      (cnt % 2 == 1 and err_theta < theta_threshold)) {
-    cnt++;
-    cnt = cnt % 8;
+  if ((count % 2 == 0 and err_dist < dist_threshold) or
+      (count % 2 == 1 and err_theta < theta_threshold)) {
+    count++;
+    count = count % 8;
  
     // Reset error term to prevent error divergence
     sum_err_dist = 0;

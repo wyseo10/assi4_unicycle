@@ -17,8 +17,8 @@ def generate_launch_description():
 
         controller_node = Node(
             namespace= 'turtlesim' + str(sim_id),
-            package= 'assi2',
-            executable= 'pub',
+            package= 'ros2_tutorial',
+            executable= 'cmd_publisher_node',
             output='screen'
         )
         ld.add_action(controller_node)
