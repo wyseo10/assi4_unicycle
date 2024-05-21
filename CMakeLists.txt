@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(assi2)
+project(ros2_tutorial)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -11,6 +11,17 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(turtlesim REQUIRED)
+#TODO: Uncomment the following!
+#find_package(visualization_msgs REQUIRED)
+
+set(ROS2_PACKAGES
+  rclcpp
+  std_msgs
+  geometry_msgs
+  turtlesim
+  #TODO: Uncomment the following!
+#  visualization_msgs
+)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
@@ -25,15 +36,23 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(pub src/pub.cpp src/cmd_publisher.cpp)
-ament_target_dependencies(pub rclcpp std_msgs geometry_msgs turtlesim)
-install(TARGETS
-  pub
+add_executable(cmd_publisher_node
+        src/cmd_publisher_node.cpp
+        src/cmd_publisher.cpp)
+ament_target_dependencies(cmd_publisher_node ${ROS2_PACKAGES})
+install(TARGETS cmd_publisher_node
   DESTINATION lib/${PROJECT_NAME})
 
+#TODO: Uncomment the following!
+#add_executable(simulator_node
+#        src/simulator_node.cpp
+#        src/simulator.cpp)
+#ament_target_dependencies(simulator_node ${ROS2_PACKAGES})
+#install(TARGETS simulator_node
+#        DESTINATION lib/${PROJECT_NAME})
+
 #install launch file
-install(DIRECTORY
-  launch
+install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 

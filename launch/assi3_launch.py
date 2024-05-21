@@ -7,13 +7,13 @@ def generate_launch_description():
 
     ld = LaunchDescription()
     for sim_id in range(0, number_of_sim):
-        simulator_node = Node(
+        turtlesim_node = Node(
             namespace = 'turtlesim' + str(sim_id),
             package='turtlesim',
             executable='turtlesim_node',
             output='screen'
         )
-        ld.add_action(simulator_node)
+        ld.add_action(turtlesim_node)
 
         controller_node = Node(
             namespace= 'turtlesim' + str(sim_id),
@@ -22,4 +22,23 @@ def generate_launch_description():
             output='screen'
         )
         ld.add_action(controller_node)
+
+    #TODO: Uncomment the following!
+    # simulator_node = Node(
+    #     namespace = 'simulator',
+    #     package='ros2_tutorial',
+    #     executable='simulator_node',
+    #     output='screen'
+    # )
+    # ld.add_action(simulator_node)
+
+    #TODO: Uncomment the following!
+    # rviz_node = Node(
+    #     package='rviz2',
+    #     namespace='rviz2',
+    #     executable='rviz2',
+    #     name='rviz2',
+    # )
+    # ld.add_action(rviz_node)
+
     return ld
