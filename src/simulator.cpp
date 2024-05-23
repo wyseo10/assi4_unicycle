@@ -20,17 +20,22 @@ Simulator::Simulator() : Node("simulator") {
 }
 
 void Simulator::timer_callback() {
+    // 10ms마다 아래 함수들을 호출합니다.
     update_state();
     publish_marker_pose();
     broadcast_tf();
 }
 
 void Simulator::cmd_callback(const geometry_msgs::msg::Twist &msg) {
+    // CmdPublisher 노드로부터 control input을 받아옵니다.
     cmd_vel.v = todo;
     cmd_vel.w = todo;
 }
 
 void Simulator::update_state() {
+    //Hint: 이 함수는 10ms 시간 주기로 호출됩니다.
+    //로봇의 state (x,y,theta)를 cmd_vel을 사용하여 업데이트 해야합니다.
+
     double x_dot = todo;
     double y_dot = todo;
     double theta_dot = todo;
@@ -41,6 +46,7 @@ void Simulator::update_state() {
 }
 
 void Simulator::publish_marker_pose() {
+    // 로봇의 현재 상태를 rviz에 시각화합니다.
     visualization_msgs::msg::MarkerArray msg;
 
     visualization_msgs::msg::Marker marker;
@@ -66,6 +72,7 @@ void Simulator::publish_marker_pose() {
 }
 
 void Simulator::broadcast_tf() {
+    // 로봇의 현재 상태를 CmdPublisher node에 전달하기 위해 tf를 사용합니다.
     geometry_msgs::msg::TransformStamped t;
 
     //TODO: implement this part!

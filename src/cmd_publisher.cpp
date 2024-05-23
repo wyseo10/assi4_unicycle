@@ -19,6 +19,8 @@ CmdPublisher::CmdPublisher() : Node("cmd_publisher") {
 }
 
 void CmdPublisher::timer_tf_callback() {
+    // Simulator에서 broadcast한 tf를 통해 현재 로봇 상태를 받습니다
+
     geometry_msgs::msg::TransformStamped t;
 
     //TODO: implement this part!
