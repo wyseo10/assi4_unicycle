@@ -30,7 +30,21 @@ void Simulator::timer_callback() {
     visualization_msgs::msg::MarkerArray msg;
 
     for(size_t id = 0; id < number_of_robots; id++) {
-        //TODO: implement this!
+        visualization_msgs::msg::Marker marker;
+        marker.header.frame_id = "world";
+        marker.ns = "pose";
+        marker.id = (int) id;
+        marker.type = visualization_msgs::msg::Marker::SPHERE;
+        marker.action = visualization_msgs::msg::Marker::ADD;
+        marker.pose.position = poses[id].position;
+        marker.scale.x = robot_radius;
+        marker.scale.y = robot_radius;
+        marker.scale.z = robot_radius;
+        marker.color.r = 1.0;
+        marker.color.g = 0.0;
+        marker.color.b = 0.0;
+        marker.color.a = 1.0;
+        msg.markers.emplace_back(marker);
     }
 
     pub_poses->publish(msg);
@@ -40,7 +54,4 @@ void Simulator::topic_callback(const turtlesim::msg::Pose &msg, size_t id) {
     poses[id].position.x = msg.x - ori + (double)id * offset;
     poses[id].position.y = msg.y - ori;
     poses[id].position.z = 0;
-
-    //TODO: implement this!
-    // poses[id].orientation = ????
 }
