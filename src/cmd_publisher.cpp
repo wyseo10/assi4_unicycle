@@ -4,31 +4,38 @@ using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 CmdPublisher::CmdPublisher() : Node("cmd_publisher") {
-  pub_cmd =
-    this->create_publisher<geometry_msgs::msg::Twist>("robot/cmd", 10);
+  // Publisher
+  pub_cmd = this->create_publisher<geometry_msgs::msg::Twist>("robot/cmd", 10);
 
-  sub_pose = this->create_subscription<visualization_msgs::msg::MarkerArray>(
-    "robot/pose", 10, std::bind(&CmdPublisher::topic_callback, this, _1));
+  // TF listener
+  tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
+  tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
 
-  timer_ = this->create_wall_timer(
-      10ms, std::bind(&CmdPublisher::timer_callback, this));
+  // Timer
+  timer_tf = this->create_wall_timer(
+            10ms, std::bind(&CmdPublisher::timer_tf_callback, this));
+  timer_cmd = this->create_wall_timer(
+      10ms, std::bind(&CmdPublisher::timer_cmd_callback, this));
 }
 
-void CmdPublisher::topic_callback(const visualization_msgs::msg::MarkerArray &msg) {
-    if(msg.markers.empty()) {
+void CmdPublisher::timer_tf_callback() {
+    geometry_msgs::msg::TransformStamped t;
+    try {
+        t = tf_buffer->lookupTransform("world", "robot", tf2::TimePointZero);
+    } catch (const tf2::TransformException &ex) {
+        RCLCPP_INFO(this->get_logger(), "Could not transform world to robot");
         return;
     }
 
-    real_x = msg.markers[0].pose.position.x;
-    real_y = msg.markers[0].pose.position.y;
-
-    geometry_msgs::msg::Quaternion q = msg.markers[0].pose.orientation;
+    real_x = t.transform.translation.x;
+    real_y = t.transform.translation.y;
+    geometry_msgs::msg::Quaternion q = t.transform.rotation;
     double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
     double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
     real_theta = std::atan2(siny_cosp, cosy_cosp);
 }
 
-void CmdPublisher::timer_callback() {
+void CmdPublisher::timer_cmd_callback() {
   // Goal assignment
   if (count == 0) {
     goal_x = 2;

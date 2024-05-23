@@ -49,7 +49,9 @@ private:
 
     void update_state();
 
-    void publish_pose();
+    void publish_marker_pose();
+
+    void broadcast_tf();
 };
 
 

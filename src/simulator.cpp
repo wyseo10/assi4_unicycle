@@ -21,7 +21,8 @@ Simulator::Simulator() : Node("simulator") {
 
 void Simulator::timer_callback() {
     update_state();
-    publish_pose();
+    publish_marker_pose();
+    broadcast_tf();
 }
 
 void Simulator::cmd_callback(const geometry_msgs::msg::Twist &msg) {
@@ -39,7 +40,7 @@ void Simulator::update_state() {
     state.theta = state.theta + theta_dot * dt;
 }
 
-void Simulator::publish_pose() {
+void Simulator::publish_marker_pose() {
     visualization_msgs::msg::MarkerArray msg;
 
     visualization_msgs::msg::Marker marker;
@@ -62,4 +63,19 @@ void Simulator::publish_pose() {
     msg.markers.emplace_back(marker);
 
     pub_pose->publish(msg);
+}
+
+void Simulator::broadcast_tf() {
+    geometry_msgs::msg::TransformStamped t;
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = "world";
+    t.child_frame_id = "robot";
+    t.transform.translation.x = state.x;
+    t.transform.translation.y = state.y;
+    t.transform.translation.z = 0;
+    t.transform.rotation.w = cos(state.theta * 0.5);
+    t.transform.rotation.x = 0;
+    t.transform.rotation.y = 0;
+    t.transform.rotation.z = sin(state.theta * 0.5);
+    tf_broadcaster->sendTransform(t);
 }
