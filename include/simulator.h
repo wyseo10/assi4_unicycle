@@ -2,11 +2,9 @@
 #define ROS2_TUTORIAL_SIMULATOR_H
 
 #include "rclcpp/rclcpp.hpp"
+#include "visualization_msgs/msg/marker_array.hpp"
+#include "tf2_ros/transform_broadcaster.h"
 #include <turtlesim/msg/pose.hpp>
-
-//TODO: Uncomment these!
-//#include "visualization_msgs/msg/marker_array.hpp"
-//#include "tf2_ros/transform_broadcaster.h"
 
 class Simulator : public rclcpp::Node {
 public:

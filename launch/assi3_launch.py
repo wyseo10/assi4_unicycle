@@ -23,7 +23,7 @@ def generate_launch_description():
         )
         ld.add_action(controller_node)
 
-    #TODO: Uncomment the following!
+    # Uncomment the following!
     # simulator_node = Node(
     #     namespace = 'simulator',
     #     package='ros2_tutorial',
@@ -31,8 +31,7 @@ def generate_launch_description():
     #     output='screen'
     # )
     # ld.add_action(simulator_node)
-
-    #TODO: Uncomment the following!
+    #
     # rviz_node = Node(
     #     package='rviz2',
     #     namespace='rviz2',
