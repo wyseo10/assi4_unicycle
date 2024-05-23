@@ -3,21 +3,29 @@
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-CmdPublisher::CmdPublisher() : Node("minimal_publisher") {
-  publisher_ =
-      this->create_publisher<geometry_msgs::msg::Twist>("turtle1/cmd_vel", 10);
+CmdPublisher::CmdPublisher() : Node("cmd_publisher") {
+  pub_cmd =
+    this->create_publisher<geometry_msgs::msg::Twist>("robot/cmd", 10);
 
-  subscription_ = this->create_subscription<turtlesim::msg::Pose>(
-      "turtle1/pose", 10, std::bind(&CmdPublisher::topic_callback, this, _1));
+  sub_pose = this->create_subscription<visualization_msgs::msg::MarkerArray>(
+    "robot/pose", 10, std::bind(&CmdPublisher::topic_callback, this, _1));
 
   timer_ = this->create_wall_timer(
       10ms, std::bind(&CmdPublisher::timer_callback, this));
 }
 
-void CmdPublisher::topic_callback(const turtlesim::msg::Pose &msg) {
-  real_x = msg.x - ori;
-  real_y = msg.y - ori;
-  real_theta = msg.theta;
+void CmdPublisher::topic_callback(const visualization_msgs::msg::MarkerArray &msg) {
+    if(msg.markers.empty()) {
+        return;
+    }
+
+    real_x = msg.markers[0].pose.position.x;
+    real_y = msg.markers[0].pose.position.y;
+
+    geometry_msgs::msg::Quaternion q = msg.markers[0].pose.orientation;
+    double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+    double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+    real_theta = std::atan2(siny_cosp, cosy_cosp);
 }
 
 void CmdPublisher::timer_callback() {
@@ -92,5 +100,5 @@ void CmdPublisher::timer_callback() {
   prev_err_theta = err_theta;
 
   // Publish!!!
-  publisher_->publish(cmd_vel);
+  pub_cmd->publish(cmd_vel);
 }
