@@ -12,7 +12,7 @@ Simulator::Simulator() : Node("simulator") {
             "robot/cmd", 10, std::bind(&Simulator::cmd_callback, this, _1));
 
     // ROS tf publisher
-    tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    tf_broadcaster = todo;
 
     // ROS timer
     timer_ = this->create_wall_timer(
@@ -26,36 +26,36 @@ void Simulator::timer_callback() {
 }
 
 void Simulator::cmd_callback(const geometry_msgs::msg::Twist &msg) {
-    cmd_vel.v = msg.linear.x;
-    cmd_vel.w = msg.angular.z;
+    cmd_vel.v = todo;
+    cmd_vel.w = todo;
 }
 
 void Simulator::update_state() {
-    double x_dot = cmd_vel.v * cos(state.theta);
-    double y_dot = cmd_vel.v * sin(state.theta);
-    double theta_dot = cmd_vel.w;
+    double x_dot = todo;
+    double y_dot = todo;
+    double theta_dot = todo;
 
-    state.x = state.x + x_dot * dt;
-    state.y = state.y + y_dot * dt;
-    state.theta = state.theta + theta_dot * dt;
+    state.x = state.x + x_dot * todo;
+    state.y = state.y + y_dot * todo;
+    state.theta = state.theta + todo;
 }
 
 void Simulator::publish_marker_pose() {
     visualization_msgs::msg::MarkerArray msg;
 
     visualization_msgs::msg::Marker marker;
-    marker.header.frame_id = "world";
+    marker.header.frame_id = todo;
     marker.ns = "pose";
     marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
-    marker.mesh_resource = "package://ros2_tutorial/mesh/quadrotor_3.dae";
-    marker.action = visualization_msgs::msg::Marker::ADD;
-    marker.pose.position.x = state.x;
-    marker.pose.position.y = state.y;
-    marker.pose.position.z = 0;
-    marker.pose.orientation.w = cos(state.theta * 0.5);
-    marker.pose.orientation.x = 0;
-    marker.pose.orientation.y = 0;
-    marker.pose.orientation.z = sin(state.theta * 0.5);
+    marker.mesh_resource = todo;
+    marker.action = todo;
+    marker.pose.position.x = todo;
+    marker.pose.position.y = todo;
+    marker.pose.position.z = todo;
+    marker.pose.orientation.w = todo;
+    marker.pose.orientation.x = todo;
+    marker.pose.orientation.y = todo;
+    marker.pose.orientation.z = todo;
     marker.scale.x = robot_scale;
     marker.scale.y = robot_scale;
     marker.scale.z = robot_scale;
@@ -67,15 +67,8 @@ void Simulator::publish_marker_pose() {
 
 void Simulator::broadcast_tf() {
     geometry_msgs::msg::TransformStamped t;
-    t.header.stamp = this->get_clock()->now();
-    t.header.frame_id = "world";
-    t.child_frame_id = "robot";
-    t.transform.translation.x = state.x;
-    t.transform.translation.y = state.y;
-    t.transform.translation.z = 0;
-    t.transform.rotation.w = cos(state.theta * 0.5);
-    t.transform.rotation.x = 0;
-    t.transform.rotation.y = 0;
-    t.transform.rotation.z = sin(state.theta * 0.5);
+
+    //TODO: implement this part!
+
     tf_broadcaster->sendTransform(t);
 }

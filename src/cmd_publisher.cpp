@@ -8,8 +8,8 @@ CmdPublisher::CmdPublisher() : Node("cmd_publisher") {
   pub_cmd = this->create_publisher<geometry_msgs::msg::Twist>("robot/cmd", 10);
 
   // TF listener
-  tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
-  tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
+  tf_buffer = todo;
+  tf_listener = todo;
 
   // Timer
   timer_tf = this->create_wall_timer(
@@ -20,19 +20,12 @@ CmdPublisher::CmdPublisher() : Node("cmd_publisher") {
 
 void CmdPublisher::timer_tf_callback() {
     geometry_msgs::msg::TransformStamped t;
-    try {
-        t = tf_buffer->lookupTransform("world", "robot", tf2::TimePointZero);
-    } catch (const tf2::TransformException &ex) {
-        RCLCPP_INFO(this->get_logger(), "Could not transform world to robot");
-        return;
-    }
 
-    real_x = t.transform.translation.x;
-    real_y = t.transform.translation.y;
-    geometry_msgs::msg::Quaternion q = t.transform.rotation;
-    double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
-    double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
-    real_theta = std::atan2(siny_cosp, cosy_cosp);
+    //TODO: implement this part!
+
+    real_x = todo;
+    real_y = todo;
+    real_theta = todo;
 }
 
 void CmdPublisher::timer_cmd_callback() {
