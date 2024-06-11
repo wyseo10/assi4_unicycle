@@ -1,47 +1,81 @@
 #include "simulator.h"
 
 using namespace std::chrono_literals;
+using std::placeholders::_1;
 
 Simulator::Simulator() : Node("simulator") {
     // ROS publisher
-    pub_poses = this->create_publisher<visualization_msgs::msg::MarkerArray>("/poses", 10);
+    pub_pose = this->create_publisher<visualization_msgs::msg::MarkerArray>("robot/pose", 10);
 
     // ROS subscriber
-    subs_pose.resize(number_of_robots);
-    for (size_t id = 0; id < number_of_robots; id++) {
-        // This allows the callback function to get argument
-        std::function<void(const turtlesim::msg::Pose msg)> fcn =
-                std::bind(&Simulator::topic_callback, this, std::placeholders::_1, id);
-        subs_pose[id] = this->create_subscription<turtlesim::msg::Pose>(
-                "/turtlesim" + std::to_string(id) + "/turtle1/pose", 10, fcn);
-    }
+    sub_cmd = this->create_subscription<geometry_msgs::msg::Twist>(
+            "robot/cmd", 10, std::bind(&Simulator::cmd_callback, this, _1));
 
     // ROS tf publisher
-    tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    tf_broadcaster = todo;
 
     // ROS timer
     timer_ = this->create_wall_timer(
             10ms, std::bind(&Simulator::timer_callback, this));
-
-    // Poses
-    poses.resize(number_of_robots);
 }
 
 void Simulator::timer_callback() {
+    // 10ms마다 아래 함수들을 호출합니다.
+    update_state();
+    publish_marker_pose();
+    broadcast_tf();
+}
+
+void Simulator::cmd_callback(const geometry_msgs::msg::Twist &msg) {
+    // CmdPublisher 노드로부터 control input을 받아옵니다.
+    cmd_vel.v = todo;
+    cmd_vel.w = todo;
+}
+
+void Simulator::update_state() {
+    //Hint: 이 함수는 10ms 시간 주기로 호출됩니다.
+    //로봇의 state (x,y,theta)를 cmd_vel을 사용하여 업데이트 해야합니다.
+
+    double x_dot = todo;
+    double y_dot = todo;
+    double theta_dot = todo;
+
+    state.x = state.x + x_dot * todo;
+    state.y = state.y + y_dot * todo;
+    state.theta = state.theta + todo;
+}
+
+void Simulator::publish_marker_pose() {
+    // 로봇의 현재 상태를 rviz에 시각화합니다.
     visualization_msgs::msg::MarkerArray msg;
+
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = todo;
+    marker.ns = "pose";
+    marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+    marker.mesh_resource = todo;
+    marker.action = todo;
+    marker.pose.position.x = todo;
+    marker.pose.position.y = todo;
+    marker.pose.position.z = todo;
+    marker.pose.orientation.w = todo;
+    marker.pose.orientation.x = todo;
+    marker.pose.orientation.y = todo;
+    marker.pose.orientation.z = todo;
+    marker.scale.x = robot_scale;
+    marker.scale.y = robot_scale;
+    marker.scale.z = robot_scale;
+    marker.color.a = 1;
+    msg.markers.emplace_back(marker);
+
+    pub_pose->publish(msg);
+}
+
+void Simulator::broadcast_tf() {
+    // 로봇의 현재 상태를 CmdPublisher node에 전달하기 위해 tf를 사용합니다.
+    geometry_msgs::msg::TransformStamped t;
 
     //TODO: implement this part!
 
-    pub_poses->publish(msg);
-}
-
-void Simulator::topic_callback(const turtlesim::msg::Pose &msg, size_t id) {
-    poses[id].position.x = msg.x - ori + (double)id * offset;
-    poses[id].position.y = msg.y - ori;
-    poses[id].position.z = 0;
-
-    //TODO: implement this!
-    //Hint: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-    // Yaw angle of the robot = msg.theta
-    // poses[id].orientation = ????
+    tf_broadcaster->sendTransform(t);
 }

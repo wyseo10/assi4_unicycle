@@ -3,24 +3,34 @@
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-CmdPublisher::CmdPublisher() : Node("minimal_publisher") {
-  publisher_ =
-      this->create_publisher<geometry_msgs::msg::Twist>("turtle1/cmd_vel", 10);
+CmdPublisher::CmdPublisher() : Node("cmd_publisher") {
+  // Publisher
+  pub_cmd = this->create_publisher<geometry_msgs::msg::Twist>("robot/cmd", 10);
 
-  subscription_ = this->create_subscription<turtlesim::msg::Pose>(
-      "turtle1/pose", 10, std::bind(&CmdPublisher::topic_callback, this, _1));
+  // TF listener
+  tf_buffer = todo;
+  tf_listener = todo;
 
-  timer_ = this->create_wall_timer(
-      10ms, std::bind(&CmdPublisher::timer_callback, this));
+  // Timer
+  timer_tf = this->create_wall_timer(
+            10ms, std::bind(&CmdPublisher::timer_tf_callback, this));
+  timer_cmd = this->create_wall_timer(
+      10ms, std::bind(&CmdPublisher::timer_cmd_callback, this));
 }
 
-void CmdPublisher::topic_callback(const turtlesim::msg::Pose &msg) {
-  real_x = msg.x - ori;
-  real_y = msg.y - ori;
-  real_theta = msg.theta;
+void CmdPublisher::timer_tf_callback() {
+    // Simulator에서 broadcast한 tf를 통해 현재 로봇 상태를 받습니다
+
+    geometry_msgs::msg::TransformStamped t;
+
+    //TODO: implement this part!
+
+    real_x = todo;
+    real_y = todo;
+    real_theta = todo;
 }
 
-void CmdPublisher::timer_callback() {
+void CmdPublisher::timer_cmd_callback() {
   // Goal assignment
   if (count == 0) {
     goal_x = 2;
@@ -92,5 +102,5 @@ void CmdPublisher::timer_callback() {
   prev_err_theta = err_theta;
 
   // Publish!!!
-  publisher_->publish(cmd_vel);
+  pub_cmd->publish(cmd_vel);
 }
