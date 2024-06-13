@@ -3,7 +3,7 @@
 <package format="3">
   <name>ros2_tutorial</name>
   <version>0.0.0</version>
-  <description>launch_five_nodes</description>
+  <description>tf2</description>
   <maintainer email="realmeteny10@gmail.com">amr</maintainer>
   <license>Apache-2.0</license>
 

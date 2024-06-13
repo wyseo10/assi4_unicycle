@@ -23,7 +23,7 @@ private:
   const double pi = 3.141592;
 
   // Robot state
-//  double ori = 5.544444561004639;
+  // double ori = 5.544444561004639;
   double ori = 0;
   double real_x = 0;
   double real_y = 0;
@@ -61,4 +61,4 @@ private:
   geometry_msgs::msg::Twist cmd_vel;
 };
 
-#endif //ROS2_TUTORIAL_CMD_PUBLISHER_H
+#endif ROS2_TUTORIAL_CMD_PUBLISHER_H

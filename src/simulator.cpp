@@ -12,7 +12,7 @@ Simulator::Simulator() : Node("simulator") {
             "robot/cmd", 10, std::bind(&Simulator::cmd_callback, this, _1));
 
     // ROS tf publisher
-    tf_broadcaster = todo;
+    tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
     // ROS timer
     timer_ = this->create_wall_timer(
@@ -50,18 +50,21 @@ void Simulator::publish_marker_pose() {
     visualization_msgs::msg::MarkerArray msg;
 
     visualization_msgs::msg::Marker marker;
-    marker.header.frame_id = todo;
+    marker.header.frame_id = "world";
     marker.ns = "pose";
     marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
-    marker.mesh_resource = todo;
-    marker.action = todo;
+    marker.mesh_resource = "packages://ros2_tutorial/mesh/quadrotor_2";
+    marker.action = visualization_msgs::msg::Marker::ADD;
+
     marker.pose.position.x = todo;
     marker.pose.position.y = todo;
     marker.pose.position.z = todo;
+
     marker.pose.orientation.w = todo;
     marker.pose.orientation.x = todo;
     marker.pose.orientation.y = todo;
     marker.pose.orientation.z = todo;
+
     marker.scale.x = robot_scale;
     marker.scale.y = robot_scale;
     marker.scale.z = robot_scale;
@@ -76,6 +79,9 @@ void Simulator::broadcast_tf() {
     geometry_msgs::msg::TransformStamped t;
 
     //TODO: implement this part!
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = "world";
+    t.child_frame_id = ;
 
     tf_broadcaster->sendTransform(t);
 }
