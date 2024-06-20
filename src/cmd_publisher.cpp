@@ -46,7 +46,7 @@ void CmdPublisher::timer_tf_callback()
 
   geometry_msgs::msg::Quaternion q = t.transform.rotation;
   double sy_cp = 2 * (q.w * q.z + q.x * q.y);
-  double cy_cp = 1 - (q.y * q.y + q.z * q.z);
+  double cy_cp = 1 - 2 * (q.y * q.y + q.z * q.z);
   real_theta = std::atan2(sy_cp, cy_cp);
 
   RCLCPP_INFO(this->get_logger(), "real_x, y, theta: %f, %f, %f", real_x, real_y, real_theta);

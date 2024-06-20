@@ -57,8 +57,8 @@ void Simulator::publish_marker_pose()
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "world";
     marker.ns = "robot0";
-    marker.type = visualization_msgs::msg::Marker::CUBE;
-    // marker.mesh_resource = "packages://ros2_tutorial/mesh/quadrotor_2";
+    marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+    marker.mesh_resource = "package://ros2_tutorial/mesh/quadrotor_3.dae";
     marker.action = visualization_msgs::msg::Marker::ADD;
 
     geometry_msgs::msg::TransformStamped t;
