@@ -6,21 +6,25 @@
 #include "tf2_ros/transform_broadcaster.h"
 #include <turtlesim/msg/pose.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
-class State {
+class State
+{
 public:
     double x = 0;
     double y = 0;
     double theta = 0;
 };
 
-class Input {
+class Input
+{
 public:
     double v = 0;
     double w = 0;
 };
 
-class Simulator : public rclcpp::Node {
+class Simulator : public rclcpp::Node
+{
 public:
     Simulator();
 
@@ -34,9 +38,9 @@ private:
     // Parameters
     double robot_scale = 0.5;
     double offset = 1.0;
-    size_t number_of_robots = 5;
+    size_t number_of_robots = 1;
     double dt = 0.01;
-
+    std::vector<geometry_msgs::msg::Pose> pose;
 
     // States and inputs
     State state;
@@ -52,7 +56,16 @@ private:
     void publish_marker_pose();
 
     void broadcast_tf();
+
+    // Cal tf
+    double roll = 0;
+    double pitch = 0;
+    double yaw = 0;
+    
+    double cr = cos(roll * 0.5);
+    double sr = sin(roll * 0.5);
+    double cp = cos(pitch * 0.5);
+    double sp = sin(pitch * 0.5);
 };
 
-
-#endif //ROS2_TUTORIAL_SIMULATOR_H
+#endif // ROS2_TUTORIAL_SIMULATOR_H

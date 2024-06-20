@@ -24,10 +24,32 @@ void CmdPublisher::timer_tf_callback()
   // Simulator에서 broadcast한 tf를 통해 현재 로봇 상태를 받습니다
   geometry_msgs::msg::TransformStamped t;
 
-  // TODO: implement this part!
+  try
+  {
+    t = tf_buffer->lookupTransform(
+        "world", "robot0", tf2::TimePointZero);
+
+    RCLCPP_INFO(this->get_logger(), "Received transform: %f, %f, %f",
+                t.transform.translation.x,
+                t.transform.translation.y,
+                t.transform.translation.z);
+  }
+  catch (const tf2::TransformException &ex)
+  {
+    RCLCPP_WARN(this->get_logger(), "Could not transform: %s", ex.what());
+  }
+
   real_x = t.transform.translation.x;
   real_y = t.transform.translation.y;
-  real_theta = t.transform.translation.z;
+
+  //quat -> yaw
+
+  geometry_msgs::msg::Quaternion q = t.transform.rotation;
+  double sy_cp = 2 * (q.w * q.z + q.x * q.y);
+  double cy_cp = 1 - (q.y * q.y + q.z * q.z);
+  real_theta = std::atan2(sy_cp, cy_cp);
+
+  RCLCPP_INFO(this->get_logger(), "real_x, y, theta: %f, %f, %f", real_x, real_y, real_theta);
 }
 
 void CmdPublisher::timer_cmd_callback()

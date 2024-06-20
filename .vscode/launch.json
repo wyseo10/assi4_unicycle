@@ -7,7 +7,7 @@
         {
             "name": "ROS: Launch",
             "request": "launch",
-            "target": "~/ros2_ws/install/ros2_tutorial/share/ros2_tutorial/launch/tutorial_launch.py",
+            "target": "~/ros2_ws/install/ros2_tutorial/share/ros2_tutorial/launch/assi4_launch.py",
             "launch": [
                 "rviz",
                 "gz",
